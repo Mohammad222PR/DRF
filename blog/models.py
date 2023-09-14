@@ -23,7 +23,7 @@ class Category(models.Model):
 
 
 class Article(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=100)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -31,7 +31,16 @@ class Article(models.Model):
     body = models.TextField(max_length=100)
     slug = models.SlugField(max_length=20, unique=True)
     created = models.DateTimeField(auto_now_add=True)
-    published = models.BooleanField(default=False)
+    published = models.BooleanField(default=True)
 
     def __str__(self):
         return self.title
+
+
+class Comment(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField(max_length=1000000000)
+    created = models.DateField()
+
+    def __str__(self):
+        return self.text
