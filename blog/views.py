@@ -12,6 +12,7 @@ from .models import Article, Comment
 from .serializers import UserSerializers, ArticleSerializers, CommentSerializers
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsUserOrReadOnly
+from rest_framework.pagination import LimitOffsetPagination
 
 
 # Create your views here.
@@ -45,13 +46,15 @@ from .permissions import IsUserOrReadOnly
 #         return Response({'product': 'hello'})
 #
 #
-# class ArticleView(APIView):
-#     def get(self, request):
-#         queryset = Article.objects.all()
-#         ser = ArticleSerializers(instance=queryset, many=True)
-#         return Response(data=[ser.data], status=status.HTTP_200_OK)
-#
-#
+class ArticleView(APIView):
+    def get(self, request):
+        queryset = Article.objects.all()
+        paginator = LimitOffsetPagination()
+        result = paginator.paginate_queryset(queryset, request=request)
+        ser = ArticleSerializers(instance=result, many=True, context={'request': request})
+        return Response(data=[ser.data], status=status.HTTP_200_OK)
+
+
 # class ArticleDetailView(APIView):
 #     def get(self, request, slug):
 #         instance = Article.objects.get(slug=slug)

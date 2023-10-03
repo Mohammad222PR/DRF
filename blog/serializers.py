@@ -25,6 +25,7 @@ class CommentSerializers(serializers.ModelSerializer):
 
 
 class ArticleSerializers(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
     comments = CommentSerializers(many=True, required=False)
     user = serializers.SlugRelatedField(read_only=True, slug_field="username")
     tag = serializers.StringRelatedField(read_only=True)
@@ -39,6 +40,13 @@ class ArticleSerializers(serializers.ModelSerializer):
             raise serializers.ValidationError('You Cant use bad title')
         else:
             return value
+
+    def get_image(self, obj):
+        request = self.context['request']
+        if obj.image:
+            image_url = obj.image.url
+            return request.build_absolute_uri(image_url)
+        return None
 
     # def get_comments(self, obj):
     #     serializer = CommentSerializers(instance=obj.comments.all(), many=True)
